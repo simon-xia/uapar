@@ -2,8 +2,7 @@
 #include "up_path.h"
 #include "up_common.h"
 
-
-Interface * interface_init(ip_t addr)
+Interface * up_interface_init(ip_t addr)
 {
 	Interface *it = (Interface*)malloc(sizeof(Interface));
 	it -> addr = addr;
@@ -13,37 +12,105 @@ Interface * interface_init(ip_t addr)
 	return it;
 }
 
-void* fetch_interface_key(void *it)
+void* up_fetch_interface_key(void *it)
 {
 	return (void*)((((Interface*)it) -> addr).int_ip);
 }
 
 // merge, use in hash
-void interface_update(void *it_old, void *it_new)
+void up_interface_update(void *it_old, void *it_new)
 {
-	up_darray_push(&(((Interface*)it_old)->pos_on_path_set), up_darray_get_element(((Interface*)it_new)->pos_on_path_set, 0));
+	up_darray_push(&(((Interface*)it_old)->pos_on_path_set), up_darray_ith_addr(((Interface*)it_new)->pos_on_path_set, 0));
 	((Interface*)it_old)->path_cnt++;
 }
 
-void interface_addpath(Interface *it, void *p)
+void up_interface_addpath(Interface *it, void *p)
 {
 	up_darray_push(&(it->pos_on_path_set), p);
 	it->path_cnt++;
 }
 
-void interface_display(void *it)
+void up_interface_display(void *it)
 {
-	display_addr(((Interface*)it) -> addr, stdout);
-	printf("\tpath_cnt: %d\n", ((Interface*)it) -> path_cnt);
+	up_ip_display((void*)&(((Interface*)it)->addr));
+	printf("\tpath_cnt: %u\n", ((Interface*)it) -> path_cnt);
 	unsigned i = 0;
 	for (; i < ((Interface*)it)->pos_on_path_set->len; i++)
 	{
-		printf("\t\t\tpath:%4d\tposition:%3d\n", ((Pos_on_path*)up_darray_get_element(((Interface*)it)->pos_on_path_set, i))->path_id, ((Pos_on_path*)up_darray_get_element((((Interface*)it))->pos_on_path_set, i))->pos);
+		printf("\t\t\tpath:%4d\tposition:%3d\n", ((Pos_on_path*)up_darray_ith_addr(((Interface*)it)->pos_on_path_set, i))->path_id, ((Pos_on_path*)up_darray_ith_addr((((Interface*)it))->pos_on_path_set, i))->pos);
 	}
 }
 
-void interface_destroy(void *it)
+void up_interface_destroy(void *it)
 {
 	up_darray_destroy(((Interface*)it)->pos_on_path_set);
 	free(((Interface*)it));
 }
+
+int up_interface_same_path(Interface *it1, Interface *it2)
+{
+	int i, j, path_id1, path_id2;
+	for (i = 0; i < it1->pos_on_path_set->len; i++)
+	{
+		path_id1 = ((Pos_on_path*)up_darray_ith_addr(it1->pos_on_path_set, i))->path_id;
+		for (j = 0; j < it2->pos_on_path_set->len; j++)
+		{
+			path_id2 = ((Pos_on_path*)up_darray_ith_addr(it2->pos_on_path_set, j))->path_id;
+			if (path_id1 == path_id2)
+				return UP_TRUE;
+		}
+	}
+	return UP_FALSE;
+}
+
+#ifdef UNIT_TEST_INTERFACE
+#include "up_test.h"
+
+int main()
+{
+	Interface *it1, *it2, *it3;
+	ip_t ip1, ip2, ip3;
+	Pos_on_path path1, path2, path3;
+
+	path1.path_id = 8;
+	path1.pos = 7;
+
+	path2.path_id = 99;
+	path2.pos = 9;
+
+	path3.path_id = 9;
+	path3.pos = 9;
+
+	ip_dot_assign(&ip1, 192, 168, 1, 1);
+	ip_dot_assign(&ip2, 192, 168, 1, 2);
+	ip_dot_assign(&ip3, 192, 168, 1, 3);
+
+	it1 = up_interface_init(ip1);
+	it2 = up_interface_init(ip2);
+	it3 = up_interface_init(ip3);
+
+	up_interface_addpath(it1, (void*)&path1);
+	up_interface_addpath(it1, (void*)&path3);
+
+	up_interface_addpath(it2, (void*)&path2);
+	up_interface_addpath(it2, (void*)&path3);
+
+	up_interface_addpath(it3, (void*)&path2);
+
+	up_interface_display(it1);
+	up_interface_display(it2);
+	up_interface_display(it3);
+
+	up_test("up_interface_same_path", up_interface_same_path(it1, it2) == UP_TRUE);
+	up_test("up_interface_same_path", up_interface_same_path(it1, it3) == UP_FALSE);
+
+	up_interface_destroy(it1);
+	up_interface_destroy(it2);
+	up_interface_destroy(it3);
+
+	up_test_report();
+
+	return 0;
+}
+
+#endif
