@@ -39,16 +39,25 @@ void up_darray_push(D_array **array, void *element)
 
 void* up_darray_find(D_array *array, void *element)
 {
+	int i;
+	if ((i = up_darray_find_index(array, element)) < 0)
+		return NULL;
+	else
+		return up_darray_ith_addr(array, i);
+}
+
+int up_darray_find_index(D_array *array, void *element)
+{
 	if (!array || !element) {
 		WARNING("invaild arguments\n");
-		return NULL;
+		return -1;
 	}
 	int i = 0;
 	for (; i < array->len; i++)
 		if (!memcmp(up_darray_ith_addr(array, i), element, array->meta_size))
-			return up_darray_ith_addr(array, i);
+			return i;
 
-	return NULL;
+	return -1;
 }
 
 void* up_darray_clear(D_array *array)
@@ -131,6 +140,9 @@ void up_darray_iterator_operate(D_array *array, void (*operate_func)(void*))
 
 void up_darray_sort(D_array *array, int (*cmp_func)(void *, void *))
 {
+	if (!array)
+		return ;
+
 	int i, j;
 	for (i = 0; i < array->len; i++)
 		for (j = i+1; j < array->len; j++)

@@ -12,19 +12,19 @@ int drop_loops(D_array *array)
 {
 	int i, j; 
 	// drop head and tail
-	up_darray_delete_one(array, 0);
-	up_darray_delete_one(array, array->len - 1);
+	//up_darray_delete_one(array, 0);
+	//up_darray_delete_one(array, array->len - 1);
 
 start:
 	for (i = 0; i < array->len; i++)
 		for (j = i+1; j < array->len; j++)
-			if (!up_darray_ele_cmp_direct(array, i, j)) {
+			if (!up_darray_ele_cmp_direct(array, i, j) && *(unsigned*)(up_darray_ith_addr(array, i)) != UP_ANONYMOUS_IP) {
 				up_darray_delete_segment(array, i, j-1);
 				goto start;
 			}
 }
 
-int load_paths(char *filename, D_array **path_set, Hash_table *it_set)
+int load_paths(char *filename, D_array **path_set, Hash_table *it_set, unsigned pre_total_path)
 {
 	char tmpbuf[MAX_INPUT_BUF_SIZE] = {0}, tmp_ip[MAX_IP_ADDR_LEN], *ip, *ip_pre;
 	char *split_char = " \t\n";
@@ -52,7 +52,7 @@ int load_paths(char *filename, D_array **path_set, Hash_table *it_set)
 		if (tmp_ip[0] != 0x00) {
 			for (ip = tmpbuf; isdigit(*ip) || *ip == '.'; ip++) ;
 			strncpy(tmp_ip + strlen(tmp_ip), tmpbuf, ip - tmpbuf);
-			printf("cat:%s\n", tmp_ip);
+			TRACE("cat:%s\n", tmp_ip);
 
 			tmp_int_ip = str_to_int_ip(tmp_ip);
 			up_darray_push(&tmp_addrset, (void*)&tmp_int_ip);
@@ -75,7 +75,12 @@ int load_paths(char *filename, D_array **path_set, Hash_table *it_set)
 
 		while (ip) {
 			//printf("output: %s\n", ip);
-			tmp_int_ip = str_to_int_ip(ip);
+			if (*ip == 'q') {
+				tmp_int_ip = UP_ANONYMOUS_IP;
+			}
+			else {
+				tmp_int_ip = str_to_int_ip(ip);
+			}
 			up_darray_push(&tmp_addrset, (void*)&tmp_int_ip);
 			//STATE("read ip: %s\n", ip);
 			ip = strtok(NULL, split_char);
@@ -83,8 +88,8 @@ int load_paths(char *filename, D_array **path_set, Hash_table *it_set)
 
 		if (flag_path_completion) {
 			drop_loops(tmp_addrset);
-			up_read_one_complete_path(path_count, tmp_addrset, path_set, it_set);
-			STATE(" == read path %d finished ==\n", path_count);
+			up_read_one_complete_path(path_count + pre_total_path, tmp_addrset, path_set, it_set);
+			TRACE("from %s read path %d finished\n", filename, path_count);
 			path_count++;
 			up_darray_clear(tmp_addrset);
 		}
@@ -113,13 +118,18 @@ static int up_read_one_complete_path(int path_cnt, D_array *tmp_addrset, D_array
 		   printf("\n");
 		   */
 
-		tmp_it_pos.path_id = path_cnt;
-		tmp_it_pos.pos = k + 1; // position count from 1
+		if (tmp_it_addr.int_ip == UP_ANONYMOUS_IP)
+			tmp_it = up_anonymous_interface;
+		else {
+			tmp_it_pos.path_id = path_cnt;
+			tmp_it_pos.pos = k + 1; // position count from 1
 
-		tmp_it = up_interface_init(tmp_it_addr); 
-		up_interface_addpath(tmp_it, (void*)&tmp_it_pos);
+			tmp_it = up_interface_init(tmp_it_addr); 
+			up_interface_addpath(tmp_it, (void*)&tmp_it_pos);
+			up_hash_insert(it_set, (void*)tmp_it);	
 
-		up_hash_insert(it_set, (void*)tmp_it);	
+			tmp_it = (Interface*)(up_hash_lookup(it_set, (void*)(tmp_it_addr.int_ip))->element); //mark, update repeat interface
+		}
 
 		up_path_add_interface(tmp_path, (void*)&tmp_it);
 

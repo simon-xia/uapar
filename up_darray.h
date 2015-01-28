@@ -34,6 +34,7 @@ D_array* up_darray_init(unsigned , unsigned );
 D_array* up_darray_resize(D_array *, unsigned );
 void up_darray_push(D_array **, void *);
 void* up_darray_find(D_array *, void*);
+int up_darray_find_index(D_array *, void *);
 void* up_darray_clear(D_array *);
 void up_darray_destroy(D_array *);
 void up_darray_delete_one(D_array *, unsigned);

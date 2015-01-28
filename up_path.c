@@ -32,3 +32,15 @@ void up_path_destroy(Path *path)
 	up_darray_destroy(path->interface_set);
 	free(path);
 }
+
+int up_path_loop_detect(Path *path)
+{
+	int i, j;
+	for (i = 0; i < path->hop_count; i++)
+		for (j = i + 1; j < path->hop_count; j++)
+		{
+			if (up_interface_int_ip(*(Interface**)up_darray_ith_addr(path->interface_set, i)) == up_interface_int_ip(*(Interface**)up_darray_ith_addr(path->interface_set, j)))
+			return UP_TRUE;
+		}
+	return UP_FALSE;
+}

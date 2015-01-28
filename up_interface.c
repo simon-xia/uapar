@@ -35,9 +35,11 @@ void up_interface_display(void *it)
 	up_ip_display((void*)&(((Interface*)it)->addr));
 	printf("\tpath_cnt: %u\n", ((Interface*)it) -> path_cnt);
 	unsigned i = 0;
-	for (; i < ((Interface*)it)->pos_on_path_set->len; i++)
+	Pos_on_path *tmp_pos;
+	for (; i < ((Interface*)it)->path_cnt; i++)
 	{
-		printf("\t\t\tpath:%4d\tposition:%3d\n", ((Pos_on_path*)up_darray_ith_addr(((Interface*)it)->pos_on_path_set, i))->path_id, ((Pos_on_path*)up_darray_ith_addr((((Interface*)it))->pos_on_path_set, i))->pos);
+		tmp_pos = (Pos_on_path*)up_darray_ith_addr(((Interface*)it)->pos_on_path_set, i);
+		printf("\t\t\tpath:%4d\tposition:%3d\n", tmp_pos -> path_id, tmp_pos -> pos);
 	}
 }
 

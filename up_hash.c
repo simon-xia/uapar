@@ -70,10 +70,7 @@ int up_hash_insert(Hash_table *ht, void *element)
 		//WARNING("[load path function] can't reach here!\n");
 		ht->update_element(lookup->element, element);
 		// mark memory leak
-		if (ht -> free_element)
-			ht -> free_element(element);
-		else
-			free(element);
+		ht -> free_element(element);
 	}
 }
 
@@ -287,6 +284,9 @@ void up_hash_iterator_operate(Hash_table *ht, void (*operate_func)(void*))
 
 D_array* up_hash_dump_darray(Hash_table *ht)
 {
+	if (!ht || !(ht->node_cnt))
+		return NULL;
+
 	D_array *array = up_darray_init(ht->node_cnt, sizeof(void*));
 	Hash_iterator *iter = up_hash_iterator_init(ht);
 	Hash_node *tmp_node;

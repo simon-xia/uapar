@@ -25,5 +25,6 @@ Path *up_path_init(unsigned);
 void up_path_add_interface(Path*, void*);
 void up_path_display(void*);
 void up_path_destroy(Path *);
+int up_path_loop_detect(Path*);
 
 #endif

@@ -23,14 +23,14 @@ typedef struct subnet {
 
 Subnet* up_subnet_init(ip_t, short);
 void up_subnet_add_ip(Subnet *, ip_t);
-void up_subnet_init_division(Hash_table *, Hash_table *);
-void up_subnet_advanced_division(Hash_table **, Hash_table* );
 void up_subnet_display(void*);
 void* up_subnet_fetch_key(void*);
 void up_subnet_destroy(void *);
 void up_subnet_update(void *, void *);
 Subnet *up_subnet_dup(Subnet *);
 
+void up_subnet_init_division(Hash_table *, Hash_table *);
+void up_subnet_advanced_division(Hash_table **, Hash_table* );
 void up_subnet_smaller_division(Hash_table* , Subnet *, Hash_table *);
 static void up_subnet_smaller_division_recursive(Hash_table*, Subnet *, short, Hash_table *);
 double up_subnet_get_integrity(Subnet *);

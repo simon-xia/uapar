@@ -19,6 +19,8 @@
 #define UP_ERR				1
 #define UP_SUCC				0
 
+#define UP_ANONYMOUS_IP		0xffffffff
+
 #define up_float_equal(f1, f2) \
 	(fabs((f1) - (f2)) < UP_FLOAT_ERROR ? 1 : 0)
 
@@ -30,5 +32,8 @@
 			*__a++ ^= *__b++; \
 		}\
 	}while(0)
+
+typedef struct interface Interface;
+extern Interface *up_anonymous_interface;
 
 #endif

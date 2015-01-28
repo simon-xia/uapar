@@ -13,6 +13,9 @@ typedef struct interface{
 	D_array			*pos_on_path_set; //through position info, we can find processor and successor
 }Interface;
 
+#define up_interface_int_ip(it) \
+	(((it)->addr).int_ip)
+
 
 Interface * up_interface_init(ip_t );
 void* up_fetch_interface_key(void *);
