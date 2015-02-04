@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <time.h>
 #include <math.h>
+#include <ctype.h>
 
 #include "up_log.h"
 
@@ -20,6 +21,7 @@
 #define UP_SUCC				0
 
 #define UP_ANONYMOUS_IP		0xffffffff
+#define UP_NONEXIST_IP		0x00000000
 
 #define up_float_equal(f1, f2) \
 	(fabs((f1) - (f2)) < UP_FLOAT_ERROR ? 1 : 0)

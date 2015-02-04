@@ -6,19 +6,21 @@
 #ifndef _UP_HASH_H_
 #define _UP_HASH_H_
 
+//typedef struct d_array D_array;
+#include "up_darray.h"
+
 #define MAX_HASH_TABLE_SIZE 4096
 
-#define UP_HASH_SUCC	0
-#define UP_HASH_ERR		1
+typedef struct hash_node Hash_node;
+typedef struct hash_table Hash_table;
+typedef struct hash_iterator Hash_iterator;
 
-typedef struct d_array D_array;
-
-typedef struct hash_node {
+struct hash_node {
 	void *element;		//key is contained in element
 	struct hash_node *next;
-}Hash_node;
+};
 
-typedef struct hash_table {
+struct hash_table {
 	unsigned int slot_size;
 	unsigned int node_cnt;
 	Hash_node **table_entry;
@@ -29,15 +31,15 @@ typedef struct hash_table {
 	void  (*update_element)(void*, void*);
 	void  (*display_element)(void*);
 
-}Hash_table;
+};
 
 // can't iterate backwards, use two iterators instead
-typedef struct hash_iterator{
+struct hash_iterator{
 	Hash_table	*table;
 	Hash_node   *current;
 	unsigned	node_index;
 	unsigned	slot_index;
-}Hash_iterator;
+};
 
 
 Hash_table* up_hash_init(int, void* (*)(void*), void (*)(void*, void*), void* (*)(void*), void (*)(void*), void (*)(void*));
@@ -61,9 +63,6 @@ void up_hash_iterator_operate(Hash_table *, void (*)(void*));
 
 void* test_hash_func(void* );
 
-
-static int up_hash_del_mid_node(Hash_table *, Hash_node *);
-static void up_hash_destroy_inner(Hash_table *, int);
 #endif
 
 // update inside or drop repeat outside, that a question

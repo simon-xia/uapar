@@ -63,4 +63,10 @@ extern Log_t* global_log;
 	}while(0)
 
 
+
+void up_log_init(Log_t**, char *, unsigned);
+void up_log_global_init(char *, unsigned);
+void up_log_uninit(Log_t *);
+void up_log_global_uninit();
+
 #endif

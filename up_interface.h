@@ -7,11 +7,13 @@
 #define INIT_INTERFACE_PATH_CNT	 5
 #define INTERFACE_HASH_SLOT_SIZE		1000
 
-typedef struct interface{
+struct interface{
 	ip_t			addr;
 	unsigned		path_cnt;
 	D_array			*pos_on_path_set; //through position info, we can find processor and successor
-}Interface;
+};
+
+typedef struct interface Interface;
 
 #define up_interface_int_ip(it) \
 	(((it)->addr).int_ip)

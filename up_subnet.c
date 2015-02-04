@@ -2,6 +2,21 @@
 #include "up_common.h"
 #include "up_interface.h"
 
+/*
+struct subnet {
+	//int net_id;
+	unsigned size;
+	short	mask_len;
+	ip_t	net_addr;
+	ip_t	broad_addr;
+	ip_t	mask_addr;
+	D_array *ip_set;
+	unsigned ip_cnt;
+};
+*/
+
+static void up_subnet_smaller_division_recursive(Hash_table*, Subnet *, short, Hash_table *);
+
 Subnet* up_subnet_init(ip_t net_addr, short mask_len)
 {
 	Subnet *sub = (Subnet*)malloc(sizeof(Subnet));
@@ -38,7 +53,7 @@ void up_subnet_init_division(Hash_table *subnet_set, Hash_table *interface_set)
 	}
 
 	Hash_iterator *iter = up_hash_iterator_init(interface_set);
-	Hash_node *tmp_node, *lookup;
+	Hash_node *tmp_node;
 	Subnet *tmp_sub;
 	ip_t tmp_ip, tmp_sub_ip;
 

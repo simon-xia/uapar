@@ -1,6 +1,20 @@
 #include "up_darray.h"
 #include "up_common.h"
 
+/*
+struct d_array {
+	unsigned len;
+	unsigned cap;
+	unsigned meta_size;
+	char *	 array;
+};
+
+struct d_array_iterator {
+	D_array *array;
+	unsigned cur;
+};
+*/
+
 D_array* up_darray_init(unsigned cap, unsigned meta_size)
 {
 	if (!cap || !meta_size)
@@ -60,7 +74,7 @@ int up_darray_find_index(D_array *array, void *element)
 	return -1;
 }
 
-void* up_darray_clear(D_array *array)
+void up_darray_clear(D_array *array)
 {
 	memset(array->array, 0x00, array->meta_size * array -> cap);
 	array->len = 0;

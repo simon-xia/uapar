@@ -8,6 +8,37 @@
 #include "up_darray.h"
 #include "up_common.h"
 
+/*
+struct hash_node {
+	void *element;		//key is contained in element
+	struct hash_node *next;
+};
+
+struct hash_table {
+	unsigned int slot_size;
+	unsigned int node_cnt;
+	Hash_node **table_entry;
+
+	void* (*hash_func)(void*);
+	void* (*fetch_key)(void*);
+	void  (*free_element)(void*);
+	void  (*update_element)(void*, void*);
+	void  (*display_element)(void*);
+
+};
+
+// can't iterate backwards, use two iterators instead
+struct hash_iterator{
+	Hash_table	*table;
+	Hash_node   *current;
+	unsigned	node_index;
+	unsigned	slot_index;
+};
+*/
+
+static int up_hash_del_mid_node(Hash_table *, Hash_node *);
+static void up_hash_destroy_inner(Hash_table *, int);
+
 Hash_table* up_hash_init(int slot_size, void* (*hash_func)(void*), void (*update_element)(void*, void*), void* (*fetch_key)(void*), void (*free_element)(void*), void (*display_element)(void*))
 {
 	if (slot_size > MAX_HASH_TABLE_SIZE || hash_func == NULL)
@@ -57,7 +88,7 @@ int up_hash_insert(Hash_table *ht, void *element)
 		lookup = (Hash_node*)malloc(sizeof(Hash_node));
 		if (!lookup) {
 			ERROR("Not enough memory\n");
-			return 0;
+			return UP_ERR;
 		}
 		lookup -> element = element;
 		unsigned hash_key = (unsigned)ht->hash_func(ht->fetch_key(element));
@@ -72,6 +103,7 @@ int up_hash_insert(Hash_table *ht, void *element)
 		// mark memory leak
 		ht -> free_element(element);
 	}
+	return UP_SUCC;
 }
 
 int up_hash_del_element(Hash_table *ht, void *element)
@@ -81,7 +113,7 @@ int up_hash_del_element(Hash_table *ht, void *element)
 		return up_hash_del_node(ht, tmp_node);
 
 	WARNING("del err: can't find the element\n");
-	return UP_HASH_ERR;
+	return UP_ERR;
 }
 
 int up_hash_del_node(Hash_table *ht, Hash_node *node)
@@ -106,7 +138,7 @@ int up_hash_del_node(Hash_table *ht, Hash_node *node)
 	ht->free_element(tmp_node->element);
 	free(tmp_node);
 	ht->node_cnt--;
-	return UP_HASH_SUCC;
+	return UP_SUCC;
 }
 
 // del non-tail node of list
@@ -120,7 +152,7 @@ static int up_hash_del_mid_node(Hash_table *ht, Hash_node *node)
 	node->next = node->next->next;
 	free(tmp_node);
 	ht->node_cnt--;
-	return UP_HASH_SUCC;
+	return UP_SUCC;
 }
 
 /* Replaced by iterator

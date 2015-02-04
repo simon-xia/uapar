@@ -1,23 +1,30 @@
 #ifndef _UP_DARRAY_H_
 #define _UP_DARRAY_H_
 
-typedef struct d_array {
+typedef struct d_array D_array;
+typedef struct d_array_iterator D_array_iterator;
+
+struct d_array {
 	unsigned len;
 	unsigned cap;
 	unsigned meta_size;
 	char *	 array;
-}D_array;
+};
 
-typedef struct d_array_iterator {
+struct d_array_iterator {
 	D_array *array;
 	unsigned cur;
-}D_array_iterator;
+};
+
 
 #define up_darray_ith_addr(a, i) \
 	((a)->array + (a)->meta_size*(i))
 
 #define up_darray_ele_cmp_direct(arr, a, b) \
 	memcmp(up_darray_ith_addr(arr, a), up_darray_ith_addr(arr, b), (arr)->meta_size)
+
+#define up_darray_set_i(arr, i, ele) \
+	memcpy(up_darray_ith_addr(arr, i), ele, (arr)->meta_size);
 
 #define up_darray_ele_swap(arr, a, b) \
 	do {\
@@ -33,13 +40,17 @@ typedef struct d_array_iterator {
 D_array* up_darray_init(unsigned , unsigned );
 D_array* up_darray_resize(D_array *, unsigned );
 void up_darray_push(D_array **, void *);
+
+// argu 2 needs the element's addr
 void* up_darray_find(D_array *, void*);
 int up_darray_find_index(D_array *, void *);
-void* up_darray_clear(D_array *);
+
+void up_darray_clear(D_array *);
 void up_darray_destroy(D_array *);
 void up_darray_delete_one(D_array *, unsigned);
 void up_darray_delete_segment(D_array *, unsigned, unsigned);
 D_array* up_darray_dup(D_array *);
+void up_darray_sort(D_array *, int (*)(void *, void *));
 
 D_array_iterator* up_darray_iterator_init(D_array *);
 void* up_darray_iterator_next(D_array_iterator *);

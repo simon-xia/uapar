@@ -1,6 +1,18 @@
 #include "up_common.h"
 #include "up_ip4.h"
 
+/*
+union ip_t{
+	struct dot_ip {
+		unsigned char f4;
+		unsigned char f3;
+		unsigned char f2;
+		unsigned char f1;	//the first field, because of Little-endian:low bit in low address
+	}dot_ip;
+	unsigned int int_ip;
+};
+*/
+
 ip_t 
 up_ip_get_subnet(ip_t ip, int sub_len)
 {
@@ -44,7 +56,8 @@ up_ip_get_broadcast_addr(ip_t subnet, ip_t mask)
 	return ret;
 }
 
-void up_ip_display(void* addr)
+void 
+up_ip_display(void* addr)
 {
 	return output_addr(*(ip_t*)addr, stdout);
 }

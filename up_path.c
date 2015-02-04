@@ -2,6 +2,19 @@
 #include "up_interface.h"
 #include "up_common.h"
 
+/*
+struct path {
+	int		path_id;
+	int		hop_count;
+	D_array	*interface_set; // a set of Interface obj's addr
+};
+
+struct pos_on_path {
+	int		path_id;
+	int		pos;
+};
+*/
+
 Path *up_path_init(unsigned id)
 {
 	Path *path = (Path*)malloc(sizeof(Path));
@@ -36,11 +49,15 @@ void up_path_destroy(Path *path)
 int up_path_loop_detect(Path *path)
 {
 	int i, j;
+	unsigned ip1;
 	for (i = 0; i < path->hop_count; i++)
+	{
+		if ((ip1 = up_interface_int_ip(*(Interface**)up_darray_ith_addr(path->interface_set, i))) == UP_ANONYMOUS_IP)
+			continue;
+
 		for (j = i + 1; j < path->hop_count; j++)
-		{
-			if (up_interface_int_ip(*(Interface**)up_darray_ith_addr(path->interface_set, i)) == up_interface_int_ip(*(Interface**)up_darray_ith_addr(path->interface_set, j)))
-			return UP_TRUE;
-		}
+			if (ip1 == up_interface_int_ip(*(Interface**)up_darray_ith_addr(path->interface_set, j)))
+				return UP_TRUE;
+	}
 	return UP_FALSE;
 }

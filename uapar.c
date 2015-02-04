@@ -4,7 +4,9 @@
 #include "up_path.h"
 #include "up_subnet.h"
 #include "up_darray.h"
+#include "up_alias.h"
 
+#ifndef DEBUG_MAIN
 Interface *up_anonymous_interface;
 
 int main()
@@ -18,7 +20,8 @@ int main()
 
 	//char *filename_set[] = {"./input_path.txt","./5k.txt", "./path_0906_cn.txt"};
 	//char *filename_set[] = {"./5k.txt"};
-	char *filename_set[] = {"./input_path.txt", "./5k.txt"};
+	char *filename_set[] = {"./path_0906_cn.txt"};
+	//char *filename_set[] = {"./input_path.txt", "./5k.txt"};
 	//char *filename_set[] = {"./100.txt", "./input_path.txt"};
 	//char *filename = "./5k.txt";
 	//char *filename;
@@ -32,6 +35,7 @@ int main()
 
 	Hash_table *subnet_set = up_hash_init(SUBNET_HASH_SLOT_SIZE, test_hash_func, up_subnet_update, up_subnet_fetch_key, up_subnet_destroy, up_subnet_display);
 
+	STATE("start to read data...\n");
 	for (i = 0; i < sizeof(filename_set)/sizeof(filename_set[0]); i++)
 	{
 		if (load_paths(filename_set[i], &path_set, interface_set, pre_total_path) == UP_ERR) {
@@ -46,9 +50,11 @@ int main()
 
 //	up_hash_display(interface_set);
 
+	/*
 	printf("\n\t#### all paths ####\n\n");
 	for (i = 0; i < path_set -> len; i++)
 		up_path_display((void*)(*(Path**)up_darray_ith_addr(path_set, i)));
+		*/
 
 	up_subnet_init_division(subnet_set, interface_set);
 	
@@ -59,12 +65,9 @@ int main()
 
 	STATE("Get %u subnets after advanced subnet division for later use\n", subnet_set->node_cnt);
 
-//	printf("\n\n########## after division #########\n");
-//	up_hash_display(subnet_set);
+//	up_hash_display(subnet_set));
 
 	D_array* subnet_array = up_hash_dump_darray(subnet_set);
-
-	up_hash_destroy_retain_element(subnet_set);
 
 	up_darray_sort(subnet_array, up_subnet_cmp);
 
@@ -75,8 +78,17 @@ int main()
 	}
 
 	// alias resolution
-//	D_array *alias_set = up_alias_resolution(interface_set, subnet_array, path_set);
+	STATE("start to resolve alias...\n");
+	D_array *alias_set = up_alias_resolution(interface_set, subnet_array, subnet_set, path_set);
+	STATE("alias resolution finished\n");
+	if (alias_set) {
+		printf("\n\n########## alias resolution results #########\n\ttotal alias: %u\n", alias_set->len);
+		for (i = 0; i < alias_set -> len; i++)
+			up_alias_display(*(D_array**)up_darray_ith_addr(alias_set, i));
+	}
 
+
+	up_hash_destroy_retain_element(subnet_set);
 
 	for (i = 0; i < path_set -> len; i++)
 		up_path_destroy(*(Path**)up_darray_ith_addr(path_set, i));
@@ -95,3 +107,4 @@ int main()
 
 	return UP_SUCC;
 }
+#endif

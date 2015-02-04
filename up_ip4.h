@@ -5,7 +5,7 @@
 
 #define MAX_IP_ADDR_SIZE 16
 
-typedef union ip_t{
+union ip_t{
 	struct dot_ip {
 		unsigned char f4;
 		unsigned char f3;
@@ -13,7 +13,8 @@ typedef union ip_t{
 		unsigned char f1;	//the first field, because of Little-endian:low bit in low address
 	}dot_ip;
 	unsigned int int_ip;
-}ip_t;
+};
+typedef union ip_t ip_t;
 
 ip_t up_ip_get_subnet(ip_t, int);
 unsigned up_ip_get_common_prefix(ip_t, ip_t);

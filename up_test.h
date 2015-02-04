@@ -16,7 +16,7 @@ int __failed_cnt = 0;
 
 #define up_test_report() \
 	do { \
-		fprintf(stderr, "\n***** %s test report *****\ntotal test %2d: %2d pass\t%2d fail\n\n", __FILE__, __test_idex, __test_idex - __failed_cnt, __failed_cnt); \
+		fprintf(stderr, "\n\t\t***** %s test report *****\n\t\ttotal test %2d:\t%2d pass\t%2d fail\n\n", __FILE__, __test_idex, __test_idex - __failed_cnt, __failed_cnt); \
 	}while(0)
 
 #endif

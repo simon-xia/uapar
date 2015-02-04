@@ -1,4 +1,3 @@
-#include "up_log.h"
 #include "up_common.h"
 
 Log_t *global_log;

@@ -8,7 +8,9 @@
 #define TMP_ADDR_SET_SIZE   8
 #define MAX_IP_ADDR_LEN		16
 
-int drop_loops(D_array *array)
+static int up_read_one_complete_path(int , D_array *, D_array **, Hash_table*);
+
+void drop_loops(D_array *array)
 {
 	int i, j; 
 	// drop head and tail
@@ -26,11 +28,10 @@ start:
 
 int load_paths(char *filename, D_array **path_set, Hash_table *it_set, unsigned pre_total_path)
 {
-	char tmpbuf[MAX_INPUT_BUF_SIZE] = {0}, tmp_ip[MAX_IP_ADDR_LEN], *ip, *ip_pre;
+	char tmpbuf[MAX_INPUT_BUF_SIZE] = {0}, tmp_ip[MAX_IP_ADDR_LEN], *ip;
 	char *split_char = " \t\n";
 	int flag_path_completion = 1, path_count = 1;
 	unsigned tmp_int_ip;
-	Hash_node *tmp_node;
 
 	D_array *tmp_addrset = up_darray_init(TMP_ADDR_SET_SIZE, sizeof(ip_t));
 
@@ -137,11 +138,13 @@ static int up_read_one_complete_path(int path_cnt, D_array *tmp_addrset, D_array
 	TRACE("get path object[%p]: id:%d hops:%d interface_set:%p\n", tmp_path, tmp_path -> path_id, tmp_path -> hop_count, tmp_path->interface_set);
 
 	up_darray_push(path_set, (void*)&tmp_path);//mark
+	return UP_SUCC;
 }
 
 #ifdef UNIT_TEST_LOAD_PATHS
 #include "up_subnet.h"
 
+Interface *up_anonymous_interface;
 int main()
 {
 	up_log_global_init(NULL, LOG_TRACE);
@@ -157,7 +160,7 @@ int main()
 
 	Hash_table *subnet_set = up_hash_init(SUBNET_HASH_SLOT_SIZE, test_hash_func, up_subnet_update, up_subnet_fetch_key, up_subnet_destroy, up_subnet_display);
 
-	load_paths(filename, &path_set, interface_set);
+	load_paths(filename, &path_set, interface_set, 0);
 
 	up_hash_display(interface_set);
 
