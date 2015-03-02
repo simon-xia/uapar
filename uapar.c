@@ -9,6 +9,14 @@
 #ifndef DEBUG_MAIN
 Interface *up_anonymous_interface;
 
+typedef struct up_cfg {
+	int log_level;
+	char *log_file;
+	char **inputfile;
+}up_cfg;
+
+up_cfg gobal_cfg;
+
 int main()
 {
 	//up_log_global_init(NULL, LOG_TRACE);
@@ -19,12 +27,11 @@ int main()
 	up_anonymous_interface = up_interface_init(up_anonymous_ip);
 
 	//char *filename_set[] = {"./input_path.txt","./5k.txt", "./path_0906_cn.txt"};
-	//char *filename_set[] = {"./5k.txt"};
-	char *filename_set[] = {"./path_0906_cn.txt"};
+	char *filename_set[] = {"./5k.txt"};
+	//char *filename_set[] = {"./path_0906_cn.txt"};
 	//char *filename_set[] = {"./input_path.txt", "./5k.txt"};
 	//char *filename_set[] = {"./100.txt", "./input_path.txt"};
-	//char *filename = "./5k.txt";
-	//char *filename;
+
 	unsigned pre_total_path = 0, pre_total_interface = 0;
 	int i;
 
@@ -80,6 +87,7 @@ int main()
 	// alias resolution
 	STATE("start to resolve alias...\n");
 	D_array *alias_set = up_alias_resolution(interface_set, subnet_array, subnet_set, path_set);
+
 	STATE("alias resolution finished\n");
 	if (alias_set) {
 		printf("\n\n########## alias resolution results #########\n\ttotal alias: %u\n", alias_set->len);
@@ -87,6 +95,12 @@ int main()
 			up_alias_display(*(D_array**)up_darray_ith_addr(alias_set, i));
 	}
 
+	
+	if (alias_set) {
+		for (i = 0; i < alias_set -> len; i++)
+			up_darray_destroy(*(D_array**)up_darray_ith_addr(alias_set, i));
+	}
+	up_darray_destroy(alias_set);
 
 	up_hash_destroy_retain_element(subnet_set);
 

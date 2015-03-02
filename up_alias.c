@@ -188,7 +188,7 @@ void up_alias_add_new_pair(D_array **alias_set, unsigned ip1, unsigned ip2)
 		up_darray_push(&tmp, (void*)&ip2);
 	}
 	else if (tmp = up_alias_find_ip(*alias_set, ip2)) {
-		up_darray_push(&tmp, (void*)&ip2);
+		up_darray_push(&tmp, (void*)&ip1);
 	}
 	else {
 		D_array *new_pair = up_alias_new_pair(ip1, ip2);
