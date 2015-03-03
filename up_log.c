@@ -2,13 +2,15 @@
 
 Log_t *global_log;
 
-void up_log_init(Log_t** new_log, char *filename, unsigned level)
+int up_log_init(Log_t** new_log, char *filename, unsigned level)
 {
 	(*new_log) = (Log_t*)malloc(sizeof(Log_t));
 	assert((*new_log) != NULL);
 	
 	if (filename) {
-		(*new_log) -> fp = fopen(filename, "r");
+		(*new_log) -> fp = fopen(filename, "w");
+		if (!(*new_log)->fp) 
+			return UP_ERR;
 		/*
 		(*new_log) -> buf = (char*)malloc(sizeof(char)*LOG_BUF_SIZE);
 		assert((*new_log) -> buf != NULL);	
@@ -24,10 +26,10 @@ void up_log_init(Log_t** new_log, char *filename, unsigned level)
 	//(*new_log) -> pos = 0;
 	(*new_log) -> level = level;
 
-	return ;
+	return UP_SUCC;
 }
 
-void up_log_global_init(char *filename, unsigned level)
+int up_log_global_init(char *filename, unsigned level)
 {
 	return up_log_init(&global_log, filename, level);
 }
@@ -65,9 +67,6 @@ void up_log_write(Log_t *log, unsigned level, char *fmt, ...)
 */
 
 #ifdef UNIT_TEST_LOG
-
-//#include ""
-
 
 int main()
 {

@@ -8,34 +8,6 @@
 #include "up_darray.h"
 #include "up_common.h"
 
-/*
-struct hash_node {
-	void *element;		//key is contained in element
-	struct hash_node *next;
-};
-
-struct hash_table {
-	unsigned int slot_size;
-	unsigned int node_cnt;
-	Hash_node **table_entry;
-
-	void* (*hash_func)(void*);
-	void* (*fetch_key)(void*);
-	void  (*free_element)(void*);
-	void  (*update_element)(void*, void*);
-	void  (*display_element)(void*);
-
-};
-
-// can't iterate backwards, use two iterators instead
-struct hash_iterator{
-	Hash_table	*table;
-	Hash_node   *current;
-	unsigned	node_index;
-	unsigned	slot_index;
-};
-*/
-
 static int up_hash_del_mid_node(Hash_table *, Hash_node *);
 static void up_hash_destroy_inner(Hash_table *, int);
 

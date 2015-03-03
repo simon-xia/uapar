@@ -2,14 +2,6 @@
 #include "up_path.h"
 #include "up_common.h"
 
-/*
-struct interface{
-	ip_t			addr;
-	unsigned		path_cnt;
-	D_array			*pos_on_path_set; //through position info, we can find processor and successor
-};
-*/
-
 Interface * up_interface_init(ip_t addr)
 {
 	Interface *it = (Interface*)malloc(sizeof(Interface));

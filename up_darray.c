@@ -1,20 +1,6 @@
 #include "up_darray.h"
 #include "up_common.h"
 
-/*
-struct d_array {
-	unsigned len;
-	unsigned cap;
-	unsigned meta_size;
-	char *	 array;
-};
-
-struct d_array_iterator {
-	D_array *array;
-	unsigned cur;
-};
-*/
-
 D_array* up_darray_init(unsigned cap, unsigned meta_size)
 {
 	if (!cap || !meta_size)

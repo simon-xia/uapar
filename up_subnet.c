@@ -2,19 +2,6 @@
 #include "up_common.h"
 #include "up_interface.h"
 
-/*
-struct subnet {
-	//int net_id;
-	unsigned size;
-	short	mask_len;
-	ip_t	net_addr;
-	ip_t	broad_addr;
-	ip_t	mask_addr;
-	D_array *ip_set;
-	unsigned ip_cnt;
-};
-*/
-
 static void up_subnet_smaller_division_recursive(Hash_table*, Subnet *, short, Hash_table *);
 
 Subnet* up_subnet_init(ip_t net_addr, short mask_len)
